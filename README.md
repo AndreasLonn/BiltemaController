@@ -8,6 +8,11 @@ preferably with the help of
 
 ## Installation
 
+First, install python 3.x and the required libraries.
+```bash
+$ pip install paho-mqtt
+```
+
 Put the `biltemacontroller.service` file in `/lib/systemd/system/` and edit the
 paths in `ExecStart` to start the script and use the correct configuration file.
 Then enable and start the service using:

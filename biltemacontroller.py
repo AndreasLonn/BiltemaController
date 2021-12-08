@@ -36,7 +36,6 @@ import configparser, queue, signal, sys, time, urllib, ast,\
     paho.mqtt.client as mqttClient, RPi.GPIO as GPIO
 from datetime import datetime
 
-
 # Read the config file specified in the command line arguments
 # or, if none were given, use the config file set as default
 config = configparser.ConfigParser(
