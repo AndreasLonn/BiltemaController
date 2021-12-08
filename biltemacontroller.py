@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Trigger Biltema outlets using
+"""Control Biltema outlets (35-392) using
     MQTT and Python on a Raspberry Pi
 
     Example of a Home Assistant configuration.yaml
@@ -25,7 +25,7 @@ import argparse
 
 # Set up command line arguments
 parser = argparse.ArgumentParser(
-    description='Trigger Biltema switches with MQTT.')
+    description='Control Biltema outlets using MQTT and Python on a Raspberry Pi.')
 
 parser.add_argument('-c', dest='path', required=True,
     help='Absolute path to config file')

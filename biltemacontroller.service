@@ -1,6 +1,6 @@
 # Place this file in /lib/systemd/system/biltemacontroller.service
 [Unit]
-Description=Controll Biltema 35-392 outlets with MQTT
+Description=Control Biltema outlets (35-392) using MQTT and Python on a Raspberry Pi
 After=multi-user.target
 
 [Service]
