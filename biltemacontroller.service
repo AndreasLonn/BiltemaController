@@ -1,0 +1,11 @@
+# Place this file in /lib/systemd/system/biltemacontroller.service
+[Unit]
+Description=Controll Biltema 35-392 outlets with MQTT
+After=multi-user.target
+
+[Service]
+ExecStart=/home/pi/Desktop/BiltemaController/biltemacontroller.py -c /home/pi/Desktop/BiltemaController/biltemacontroller.conf
+User=pi
+
+[Install]
+WantedBy=multi-user.target
