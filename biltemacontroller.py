@@ -24,8 +24,8 @@
 import argparse
 
 # Set up command line arguments
-parser = argparse.ArgumentParser(
-    description='Control Biltema outlets using MQTT and Python on a Raspberry Pi.')
+parser = argparse.ArgumentParser(description='Control Biltema outlets (35-392)\
+        using MQTT and Python on a Raspberry Pi.')
 
 parser.add_argument('-c', dest='path', required=True,
     help='Absolute path to config file')
@@ -37,8 +37,8 @@ import configparser, queue, signal, sys, time, urllib, ast,\
 from datetime import datetime
 
 
-# Read the config file specified in the command line arguments or, if
-# none were given, use the config file set as default
+# Read the config file specified in the command line arguments
+# or, if none were given, use the config file set as default
 config = configparser.ConfigParser(
     interpolation=configparser.ExtendedInterpolation())
 config.read(args.path)
@@ -79,7 +79,7 @@ def triggerChannel(channel, state, output=False,
 
 # Create array of topics for the switches
 # by looping through the array of channels
-channelTopics = [config['MQTT State']['topicPrefix'] + str(channel)\
+channelTopics = [config['MQTT State']['topicStatePrefix'] + str(channel)\
     for channel in pins]
 
 # Create a queue of messages to handle multiple messages comming in at once
@@ -120,8 +120,10 @@ def on_connect(client, userdata, flags, rc):
             log('Setting up subscriptions')
 
             # Tell anyone listening that we're online
-            sendMessage(config['MQTT Availability']['connectionTopic'],
-                config['MQTT Availability']['payloadConnect'], retain=True)
+            if config['MQTT Availability']['topicAvailability']:
+                sendMessage(config['MQTT Availability']['topicAvailability'],
+                    config['MQTT Availability']['payloadAvailable'],
+                    retain=bool(config['MQTT Availability']['retainAvailability']))
 
             # Set up subscriptions
             for channelTopic in channelTopics:
@@ -153,10 +155,13 @@ if config['Broker']['brokerUsername'] and config['Broker']['brokerPassword']:
 client.on_connect=on_connect
 client.on_message=on_message
 
-# Tell broker to send unavalability message if connection is lost
+# Tell broker to send unavailability message if connection is lost
 # without calling 'disconnect()'
-client.will_set(config['MQTT Availability']['connectionTopic'],
-    config['MQTT Availability']['payloadDisconnect'], retain=True)
+if config['MQTT Availability']['topicAvailability']:
+    log('Setting up will (LWT)')
+    client.will_set(config['MQTT Availability']['topicAvailability'],
+        config['MQTT Availability']['payloadUnavailable'],
+        retain=bool(config['MQTT Availability']['retainAvailability']))
 
 log('Connecting to broker')
 client.connect(config['Broker']['brokerURL'])
@@ -181,17 +186,18 @@ try:
                 values = payload.split(',')
                 state = values[0]
 
-                if state == config['MQTT State']['payloadOn']\
+                if state == config['MQTT State']['payloadStateOn']\
                     or\
-                   state == config['MQTT State']['payloadOff']:
+                   state == config['MQTT State']['payloadStateOff']:
 
                     triggerChannel(
-                        topic.removeprefix(config['MQTT State']['topicPrefix']),
-                        state == config['MQTT State']['payloadOn'])
+                        topic.removeprefix(config['MQTT State']['topicStatePrefix']),
+                        state == config['MQTT State']['payloadStateOn'])
 
                     # Send new state
-                    sendMessage(
-                        topic + config['MQTT State']['topicStateSuffix'], state)
+                    if config['MQTT State']['topicStateSuffix']:
+                        sendMessage(topic +\
+                            config['MQTT State']['topicStateSuffix'], state)
                 else:
                     log('Unknown state:', state)
             else:
@@ -203,8 +209,11 @@ try:
 finally:
     # Send unavailability message, disconnect and clean up GPIO
     log('Cleaning up...')
-    sendMessage(config['MQTT Availability']['connectionTopic'],
-        config['MQTT Availability']['payloadDisconnect'], retain=True)
+
+    if config['MQTT Availability']['topicAvailability']:
+        sendMessage(config['MQTT Availability']['topicAvailability'],
+            config['MQTT Availability']['payloadUnavailable'],
+            retain=bool(config['MQTT Availability']['retainAvailability']))
     client.disconnect()
     GPIO.cleanup()
     log('Done')

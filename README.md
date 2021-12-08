@@ -8,14 +8,14 @@ preferably with the help of
 
 ## Installation
 
-Put the `biltemacontroller.service` file in `/lib/systemd/system/`. Edit paths in
-`ExecStart` to start the script and use the correct configuration file. Then
-enable and start the service using:
+Put the `biltemacontroller.service` file in `/lib/systemd/system/` and edit the
+paths in `ExecStart` to start the script and use the correct configuration file.
+Then enable and start the service using:
 ```bash
 $ sudo systemctl enable biltemacontroller.service
 $ sudo systemctl start biltemacontroller.service
 ```
-You can check that the script is running using:
+You can then check that the script is running using:
 ```bash
 $ sudo systemctl status biltemacontroller.service
 ```
@@ -34,11 +34,15 @@ brokerPassword=
 ### Pin and MQTT configuration
 
 The `pins` configuration entry is a python dictionary where the key is the name
-of the outlet (this value is added to the `topicPrefix` to create the MQTT
+of the outlet (this value is added to the `topicStatePrefix` to create the MQTT
 topic for that outlet). The value of the dictionary element is a touple of the
 pin that turns the outlet off, and the pin that turns it on. For example:
 `'1':(4,14)` means that the outlet is called `1`, that pin `4` turns the outlet
 off and that pin `14` turns it on.
+
+The `triggerDelay` refers to the delay between the HIGH and LOW and again after the
+LOW for the GPIO pin. This is entered in seconds. Increase this if the remote control
+doesn't have time to send signals.
 
 #### State
 
@@ -47,21 +51,25 @@ When the outlet has been turned on or off, a MQTT message will be sent letting
 off. This message will use the same topic as the original message, but will add
 the `topicStateSuffix` att the end.
 
+To not use this feature, leave `topicStateSuffix` blank.
+
 #### Availability
 
 When the script is executed it will let anyone listening know that it is online
-by sending a message with the topic specified in `connectionTopic` with the
-content specified in `payloadConnect`. When the script is stopped it will send
-a message with the topic specified in `connectionTopic` and the content
-specified in `payloadDisconnect`. If the script is killed the MQTT broker will
-send the disconnect message on it's behalf using MQTT:s
+by sending a message with the topic specified in `topicAvailability` with the
+content specified in `payloadAvailable`. When the script is stopped it will send
+a message with the topic specified in `topicAvailability` and the content
+specified in `payloadUnavailable`. If the script is killed the MQTT broker will
+send the disconnect message on its behalf using MQTT:s
 [LWT](https://www.hivemq.com/blog/mqtt-essentials-part-9-last-will-and-testament/)
 feature.
+
+To not use this feature, leave `topicAvailability` blank.
 
 ## Control using [Home Assistant](https://www.home-assistant.io/)
 
 Here is an example entry in `configuration.yaml` using
-[MQTT Switch](https://www.home-assistant.io/integrations/switch.mqtt/):
+[MQTT Switch](https://www.home-assistant.io/integrations/switch.mqtt/) integration:
 
 ```yaml
 switch:
