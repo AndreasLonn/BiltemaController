@@ -6,19 +6,19 @@
     Example of a Home Assistant configuration.yaml
     entry using the MQTT Switch integration:
 
-    switch:
-      - platform: mqtt
-        name: "My light"
-        unique_id: biltema.switch.1
-        retain: true
-        command_topic: "biltemactrl/switch/1"
-        state_topic: "biltemactrl/switch/1/state"
-        availability_topic: "biltemactrl/availability"
-        device:
-            name: "Biltema Switch Channel 1"
-            manufacturer: "Biltema"
-            model: "35-392"
-            identifiers: "35-392.c1"
+    mqtt:
+      switch:
+          - name: "My light"
+          unique_id: biltema.switch.1
+          retain: true
+          command_topic: "biltemactrl/switch/1"
+          state_topic: "biltemactrl/switch/1/state"
+          availability_topic: "biltemactrl/availability"
+          device:
+              name: "Biltema Switch Channel 1"
+              manufacturer: "Biltema"
+              model: "35-392"
+              identifiers: "35-392.c1"
 """
 
 import argparse

@@ -77,19 +77,19 @@ Here is an example entry in `configuration.yaml` using
 [MQTT Switch](https://www.home-assistant.io/integrations/switch.mqtt/) integration:
 
 ```yaml
-switch:
-  - platform: mqtt
-    name: "My outlet"
-    unique_id: biltema.switch.1
-    retain: true
-    command_topic: "biltemactrl/switch/1"
-    state_topic: "biltemactrl/switch/1/state"
-    availability_topic: "biltemactrl/availability"
-    device:
-      name: "Biltema Switch Channel 1"
-      manufacturer: "Biltema"
-      model: "35-392"
-      identifiers: "35-392.c1"
+mqtt:
+  switch:
+    - name: "My light"
+      unique_id: biltema.switch.1
+      retain: true
+      command_topic: "biltemactrl/switch/1"
+      state_topic: "biltemactrl/switch/1/state"
+      availability_topic: "biltemactrl/availability"
+      device:
+          name: "Biltema Switch Channel 1"
+          manufacturer: "Biltema"
+          model: "35-392"
+          identifiers: "35-392.c1"
 ```
 
 ## Control using the [command line](https://mosquitto.org/man/mosquitto_pub-1.html)
